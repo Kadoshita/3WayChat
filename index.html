@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>3WayChat</title>
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<script src="https://code.jquery.com/jquery-3.1.1.min.javascript"></script>
+	<script type="text/javascript" src="https://cdn.skyway.io/skyway.js"></script>
+	<script type="text/javascript">
+		var MODE=0;
+		function speedtest() {
+			var start = (new Date()).getTime();
+			$.get('/tmp', function(data) {
+				var end = (new Date()).getTime();
+				var sec = (end - start) / 1000;
+				var bytesPerSec = Math.round(data.length / sec);
+				var speed=(bytesPerSec * 8 / 1000 / 1000);
+				$('#speed-result').append(speed);
+				if(speed>=5){
+					MODE=1;
+				}
+				else if(speed>=1){
+					MODE=2;
+				}
+				else {
+					MODE=3;
+				}
+			});
+		}
+		speedtest();
+	</script>
+</head>
+<body>
+<p id="speed-result"></p>
+<div id="input-roomname">
+	<input type="text" name="roomname" id="room-name">
+	<button id="enter-button">入室</button>
+</div>
+<div id="videos-area">
+	<div id="my-video-area">
+		<video id="my-video" muted="true" autoplay></video>
+	</div>
+	<div id="canvas-area">
+		<video id="tmp-video" muted="true" autoplay style="display: none;"></video>
+		<canvas id="my-canvas" style="width: 180px;height: auto;"></canvas>
+	</div>
+	<button id="exit-button">終了</button>
+	<div id="peer-videos-area"></div>
+</div>
+<div id="text-area">
+	<p id="receive-msg"></p>
+	<textarea id="send-msg"></textarea><br>
+	<button id="send-button">送信</button>
+</div>
+<div id="audio-area">
+</div>
+<script src="js/script.js"></script>
+</body>
+</html>
