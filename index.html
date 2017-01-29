@@ -4,7 +4,9 @@
 	<title>3WayChat</title>
 	<link rel="shortcut icon" href="favicon.ico">
 	<link rel="stylesheet" type="text/css" href="css/style.css">
-	<script src="https://code.jquery.com/jquery-3.1.1.min.javascript"></script>
+	<link rel="stylesheet" type="text/css" href="js/bower_components/sweetalert/dist/sweetalert.css">
+	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+	<script type="text/javascript" src="js/bower_components/sweetalert/dist/sweetalert-dev.js"></script>
 	<script type="text/javascript" src="https://cdn.skyway.io/skyway.js"></script>
 	<script type="text/javascript">
 		var MODE=0;
@@ -15,7 +17,6 @@
 				var sec = (end - start) / 1000;
 				var bytesPerSec = Math.round(data.length / sec);
 				var speed=(bytesPerSec * 8 / 1000 / 1000);
-				$('#speed-result').append(speed);
 				if(speed>=5){
 					MODE=1;
 				}
@@ -31,29 +32,40 @@
 	</script>
 </head>
 <body>
-<p id="speed-result"></p>
-<div id="input-roomname">
-	<input type="text" name="roomname" id="room-name">
-	<button id="enter-button">入室</button>
-</div>
-<div id="videos-area">
-	<div id="my-video-area">
-		<video id="my-video" muted="true" autoplay></video>
+	<div id="init">
+		<div id="input-roomname">
+			<input type="text" name="roomname" id="room-name"><br>
+			<button id="enter-button">入室</button>
+		</div>
 	</div>
-	<div id="canvas-area">
-		<video id="tmp-video" muted="true" autoplay style="display: none;"></video>
-		<canvas id="my-canvas" style="width: 180px;height: auto;"></canvas>
+	<div id="select">
+		<p id="speed-message"></p>
+		<button id="high">ビデオ+テキストチャット</button><br>
+		<button id="mid">スナップショット+音声<br>+テキストチャット</button><br>
+		<button id="low">テキストチャットのみ</button><br>
 	</div>
-	<button id="exit-button">終了</button>
-	<div id="peer-videos-area"></div>
-</div>
-<div id="text-area">
-	<p id="receive-msg"></p>
-	<textarea id="send-msg"></textarea><br>
-	<button id="send-button">送信</button>
-</div>
-<div id="audio-area">
-</div>
-<script src="js/script.js"></script>
+	<div id="chat">
+		<div id="videos-area">
+			<div id="my-video-area">
+				<video id="my-video" muted="true" autoplay></video>
+				<p>Your Video</p>
+			</div>
+			<div id="canvas-area">
+				<video id="tmp-video" muted="true" autoplay style="display: none;"></video>
+				<canvas id="my-canvas" style="width: 180px;height: auto;"></canvas>
+			</div>
+			<div id="peer-videos-area"></div>
+		</div>
+		<div id="text-area">
+			<textarea id="send-msg"></textarea><br>
+			<button id="send-button">送信</button>
+			<br><br><button id="exit-button">終了</button>
+
+			<p id="receive-msg"></p>
+		</div>
+		<div id="audio-area">
+		</div>
+	</div>
+	<script src="js/script.js"></script>
 </body>
 </html>

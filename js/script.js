@@ -1,99 +1,160 @@
 navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 var peer = new Peer({
-	key: 'Your API Key',
+	key: '6e837f61-b5f8-4a01-aae5-bb21c54ca930',
 	debug: 3
 });
+var roomname='';
 var room;
 var localStream=null;
 peer.on('error', function(err){
 	alert(err.message);
 });
-$(function(){
+
+init();
+
+function init () {
+	$('#init').show();
+	$('#select').hide();
+	$('#chat').hide();
+
 	$('#enter-button').click(function() {
 		console.log(MODE);
-		var roomname=$('#room-name').val();
+		roomname=$('#room-name').val();
 		if(!roomname){
 			return;
 		}
 		console.log(roomname);
-		if(MODE===1){
-			navigator.mediaDevices.getUserMedia({video: true, audio: true})
-			.then(function (stream){
-				localStream=stream;
-				$('#my-video').prop('src', URL.createObjectURL(stream));
+		select();
+	});
+}
+function select () {
+	$('#select').show();
+	$('#init').hide();
+	$('#chat').hide();
 
-				room=peer.joinRoom('3waychat_'+roomname,{mode:'sfu',stream:localStream});
-				RoomManager(room);
-			}).catch(function (error){
-				console.error(error);
-				alert('ERROR!! please reload this page');
-				return;
-			});
-		}
-		else if(MODE===2){
-			navigator.mediaDevices.getUserMedia({video: false, audio: true})
-			.then(function (stream){
-				localStream=stream;
-				var roomname=$('#room-name').val();
-				if(!roomname){
-					return;
-				}
-				console.log(roomname);
+	switch (MODE) {
+		case 1:
+			$('#speed-message').append('あなたの環境では、ビデオ+テキストチャットをお勧めします。');
+			break;
+		case 2:
+			$('#speed-message').append('あなたの環境では、スナップショット+音声+テキストチャットをお勧めします。');
+			break;
+		case 3:
+			$('#speed-message').append('あなたの環境では、テキストチャットのみをお勧めします。');
+			break;
+		default:
+			$('#speed-message').append('ERROR');
+			break;
+	}
 
-				room=peer.joinRoom('3waychat_'+roomname,{mode:'sfu',stream:localStream});
-				RoomManager(room);
-			}).catch(function (error){
-				console.error(error);
-				alert('ERROR!! please reload this page');
-				return;
-			});
+	$('#high').click(function() {
+		MODE=1;
+		chat();
+		return;
+	});
+	$('#mid').click(function() {
+		MODE=2;
+		chat();
+		return;
+	});
+	$('#low').click(function() {
+		MODE=0;
+		chat();
+		return;
+	});
+}
+function chat () {
+	$('#chat').show();
+	$('#init').hide();
+	$('#select').hide();
+	if(MODE===1){
+		navigator.mediaDevices.getUserMedia({video: true, audio: true})
+		.then(function (stream){
+			localStream=stream;
+			$('#my-video').prop('src', URL.createObjectURL(stream));
 
-			navigator.mediaDevices.getUserMedia({video: true, audio: false})
-			.then(function (stream){
-				console.log(URL.createObjectURL(stream));
-				$('#tmp-video').prop('src', URL.createObjectURL(stream));
-				var canvas=document.getElementById('my-canvas');
-				var tmpVideo=document.getElementById('tmp-video');
-				setInterval(function () {
-					if(room!=null){
-						var ctx = canvas.getContext('2d');
-						ctx.drawImage(tmpVideo, 0, 0, canvas.width, canvas.height);
-						canvas.toBlob(function (blob) {
-							room.send(blob);
-						});
-					}
-				},2000);
-			}).catch(function (error){
-				console.error('could not get user media:', error);
-				return;
-			});
-		}
-		else{
 			room=peer.joinRoom('3waychat_'+roomname,{mode:'sfu',stream:localStream});
 			RoomManager(room);
-		}
-		
-	});
-	$('#exit-button').click(function(){
-		room.close();
-		localStream=null;
-		if(MODE===1){
-			$('#my-video').prop('src', '');
-			$('#peer-videos-area').empty();
-		}
-		else if (MODE===2) {
-			$('#audio-area').empty();
-			$('#peer-videos-area').empty();
-		}
-	});
+		}).catch(function (error){
+			console.error(error);
+			sweetAlert('ERROR!!', 'please reload this page', 'error');
+			return;
+		});
+	}
+	else if(MODE===2){
+		navigator.mediaDevices.getUserMedia({video: false, audio: true})
+		.then(function (stream){
+			localStream=stream;
+			var roomname=$('#room-name').val();
+			if(!roomname){
+				return;
+			}
+			console.log(roomname);
 
-	$('#send-button').click(function() {
-		var msg=$('#send-msg').val();
-		console.log(msg);
-		room.send(msg);
+			room=peer.joinRoom('3waychat_'+roomname,{mode:'sfu',stream:localStream});
+			RoomManager(room);
+		}).catch(function (error){
+			console.error(error);
+			sweetAlert('ERROR!!', 'please reload this page', 'error');
+			return;
+		});
+
+		navigator.mediaDevices.getUserMedia({video: true, audio: false})
+		.then(function (stream){
+			console.log(URL.createObjectURL(stream));
+			$('#tmp-video').prop('src', URL.createObjectURL(stream));
+			var canvas=document.getElementById('my-canvas');
+			var tmpVideo=document.getElementById('tmp-video');
+			setInterval(function () {
+				if(room!=null){
+					var ctx = canvas.getContext('2d');
+					ctx.drawImage(tmpVideo, 0, 0, canvas.width, canvas.height);
+					canvas.toBlob(function (blob) {
+						room.send(blob);
+					});
+				}
+			},2000);
+		}).catch(function (error){
+			console.error('could not get user media:', error);
+			sweetAlert('ERROR!!', 'please reload this page', 'error');
+			return;
+		});
+	}
+	else{
+		room=peer.joinRoom('3waychat_'+roomname,{mode:'sfu',stream:localStream});
+		RoomManager(room);
+	}
+
+	swal({
+		title: 'Success!',
+		text: 'あなたは'+roomname+ 'に入室しました。',
+		typr:'success',
+		timer: 1500,
+		showConfirmButton: true
 	});
+}
+$('#exit-button').click(function(){
+	room.close();
+	localStream=null;
+	if(MODE===1){
+		$('#my-video').prop('src', '');
+		$('#peer-videos-area').empty();
+	}
+	else if (MODE===2) {
+		$('#audio-area').empty();
+		$('#peer-videos-area').empty();
+	}
+
+	init();
 });
 
+$('#send-button').click(function() {
+	var msg=$('#send-msg').val();
+	console.log(msg);
+	room.send(msg);
+
+	$('#send-msg').val('');
+});
 function RoomManager(room) {
 	room.on('stream', function(stream){
 		var streamURL = URL.createObjectURL(stream);
@@ -102,7 +163,7 @@ function RoomManager(room) {
 		if(MODE===1){
 			$('#peer-videos-area').append($(
 				'<div id="div_' + peerId+'">'+
-				'<video autoplay class="remoteVideos" src="' + streamURL + '" id="video_' + peerId + '"><br>' +
+				'<video autoplay class="remoteVideos" src="' + streamURL + '" id="video_' + peerId + '"></video><br>' +
 				'<span style="text-align;center;">'+peerId+'</span>'+
 				'</div>'));
 		}
