@@ -12,7 +12,7 @@
 		var MODE=0;
 		function speedtest() {
 			var start = (new Date()).getTime();
-			$.get('/tmp', function(data) {
+			$.get('./tmp', function(data) {
 				var end = (new Date()).getTime();
 				var sec = (end - start) / 1000;
 				var bytesPerSec = Math.round(data.length / sec);
